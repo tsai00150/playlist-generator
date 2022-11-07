@@ -1,9 +1,15 @@
 from flask import Flask, redirect, render_template, request, session, url_for
 import os
+from sqlalchemy import *
 
 app = Flask(__name__)
 
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+
+DATABASEURI = "postgresql://th2990:jz3581@w4111.cisxo09blonu.us-east-1.rds.amazonaws.com/proj1part2"
+engine = create_engine(DATABASEURI)
+conn = engine.connect()
+
 
 @app.route('/')
 def home(): 
