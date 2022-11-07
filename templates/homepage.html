@@ -5,14 +5,13 @@
     </head>
     <body>
         <form method="POST">
-                <input type="search" name="tracksearch">
-            <input type="submit" value="Search">
-            <h2><b>Song Page</b></h2><br />
+            <h2><b>Song Page:</b></h2><br />
             <div>Enter the song you want to search</div>
-            <input type="search" name="searchsong">
-            <input type="submit" value="Search song"><br />
-
-            <b><h2>Filter Song</b></h2><br/>
+            <input type="search" name="track_search">
+            <input type="submit" name="track_search_submit" value="Search">
+        </form>
+        <form method="POST">
+            <b><h2>Filter Song:</b></h2><br/>
             <div>Enter the artist_name that you  want to listen</div>
             <input type="text" name="artist_name">
             <div>Enter the album_name that you  want to listen</div>
@@ -34,10 +33,11 @@
             <div>Enter the key that you  want to listen</div>
             <input type="text" name="key"><br/>
             <br/>
-            <input type="submit" value="filterSearch">
-
+            <input type="submit" name="filter_search_submit" value="Create Playlist">
+        </form>
+        <form> 
             <b><h2>Your Playlist</b></h2><br/>
-            <input type="submit" value="playlist">
-            </form>
+            <input type="button" value="playlist">
+        </form>
     </body>
 </html>
