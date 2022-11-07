@@ -7,7 +7,7 @@ app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
 @app.route('/')
-def home():
+def home(): 
     if not session.get('logged_in'):
         return render_template('login.html')
     else:
@@ -15,7 +15,7 @@ def home():
 
 @app.route('/login', methods=['POST'])
 def do_admin_login():
-    if request.form['password'] == 'password' and request.form['username'] == 'admin':
+    if request.form['password'] == 'p' and request.form['username'] == 'a':
         session['logged_in'] = True
         return redirect(url_for('homepage'))
     else:
@@ -25,7 +25,6 @@ def do_admin_login():
 
 @app.route('/homepage', methods=['GET','POST'])
 def homepage():
-    print(request.form['tracksearch'])
     return render_template('homepage.html')
 
 
