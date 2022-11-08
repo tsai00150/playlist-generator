@@ -12,6 +12,8 @@ engine = create_engine(DATABASEURI)
 conn = engine.connect()
 
 
+
+
 @app.route('/')
 def home(): 
     if not session.get('logged_in'):
@@ -52,11 +54,18 @@ def homepage():
     playlist = list(cursor.fetchall())
     return render_template('homepage.html')
 
-@app.route('/playlists/', methods=['GET','POST'])
-def playlists():
+@app.route('/playlists/<int:playlist_id>', methods=['GET','POST'])
+def playlists(playlist_id):
     if not session.get('logged_in'):
         return render_template('login.html')
-    return render_template('playlists.html', email = session['email'])
+
+    query = text('''SELECT Track.track_name FROM TRACK WHERE Track.track_id in 
+(SELECT Track_has_playlist.track_id FROM Track_has_playlist WHERE Track_has_playlist.playlist_id = :id)''')
+    cursor = conn.execute(query,id = playlist_id)
+    sum = list(cursor.fetchall())
+    
+    return render_template('playlists.html', song = sum)
+
 
 if __name__ == "__main__":
     app.secret_key = os.urandom(12)
