@@ -45,7 +45,11 @@ def homepage():
             print(request.form['track_search'])
         if request.form.get('filter_search_submit') == 'Create Playlist':
             print(request.form)
-
+    
+    email = session['email']
+    query = text("select p.playlist_id, p.name from Playlist_Produce as p where p.email = :email")
+    cursor = conn.execute(query, email=email)
+    playlist = list(cursor.fetchall())
     return render_template('homepage.html')
 
 @app.route('/playlists/', methods=['GET','POST'])
