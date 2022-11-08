@@ -35,9 +35,10 @@
             <br/>
             <input type="submit" name="filter_search_submit" value="Create Playlist">
         </form>
-        <form> 
-            <b><h2>Your Playlist</b></h2><br/>
-            <input type="button" value="playlist">
-        </form>
+        <b><h2>Your Playlists:</b></h2><br/>
+        {% for item in playlist %}
+            <a href="{{ url }}{{ item[0] }}"+>{{ item[1] }}</a>
+            <br>
+        {% endfor%}
     </body>
 </html>
