@@ -21,15 +21,22 @@ def home():
     else:
         return redirect(url_for('homepage'))
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def do_admin_login():
-    if request.form['password'] == 'p' and request.form['username'] == 'a':
+    if request.method =='POST':
+        email = request.form['email']
+        password = request.form['password']
+        query = text("select * from User_info as u where u.email = :email and u.password = :password")
+        cursor = conn.execute(query, email=email, password=password)
+        account_info = cursor.fetchone()
+        if not account_info:
+            return render_template('login.html')
         session['logged_in'] = True
-        session['username'] = 'a'
-        session['password'] = 'p'
+        session['email'] = account_info[0]
+        session['password'] = account_info[1]
         return redirect(url_for('homepage'))
-    else:
-        return render_template('login.html')
+    
+    return render_template('login.html')
 
 @app.route('/homepage', methods=['GET','POST'])
 def homepage():
@@ -48,12 +55,14 @@ def homepage():
 def playlists(playlist_id):
     if not session.get('logged_in'):
         return render_template('login.html')
+
     query = text('''SELECT Track.track_name FROM TRACK WHERE Track.track_id in 
 (SELECT Track_has_playlist.track_id FROM Track_has_playlist WHERE Track_has_playlist.playlist_id = :id)''')
     cursor = conn.execute(query,id = playlist_id)
     sum = list(cursor.fetchall())
     
     return render_template('playlists.html', song = sum)
+
 
 if __name__ == "__main__":
     app.secret_key = os.urandom(12)
