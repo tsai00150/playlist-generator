@@ -51,7 +51,7 @@ def homepage():
 
     return render_template('homepage.html')
 
-@app.route('/playlists', methods=['GET','POST'])
+@app.route('/playlists/<int:playlist_id>', methods=['GET','POST'])
 def playlists(playlist_id):
     if not session.get('logged_in'):
         return render_template('login.html')
