@@ -52,7 +52,8 @@ def homepage():
     query = text("select p.playlist_id, p.name from Playlist_Produce as p where p.email = :email")
     cursor = conn.execute(query, email=email)
     playlist = list(cursor.fetchall())
-    return render_template('homepage.html')
+    return render_template('homepage.html', \
+        url=request.host_url+'playlists/', playlist=playlist)
 
 @app.route('/playlists/<int:playlist_id>', methods=['GET','POST'])
 def playlists(playlist_id):
