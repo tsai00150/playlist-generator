@@ -43,17 +43,31 @@ def homepage():
     if not session.get('logged_in'):
         return render_template('login.html')
     if request.method =='POST':
+
         if request.form.get('track_search_submit') == 'Search':
-            print(request.form['track_search'])
+            search_word = request.form['track_search']
+            return redirect(url_for('search_result', search_word=search_word))
+
         if request.form.get('filter_search_submit') == 'Create Playlist':
-            print(request.form)
+            print(request.form)#TODO
     
-    email = session['email']
     query = text("select p.playlist_id, p.name from Playlist_Produce as p where p.email = :email")
-    cursor = conn.execute(query, email=email)
+    cursor = conn.execute(query, email=session['email'])
     playlist = list(cursor.fetchall())
     return render_template('homepage.html', \
         url=request.host_url+'playlists/', playlist=playlist)
+
+@app.route('/search_result/<search_word>', methods=['GET','POST'])
+def search_result(search_word):
+    if not session.get('logged_in'):
+        return render_template('login.html')
+    search_word_sql = '%' + search_word + '%'
+    query = text("select * from Track as t where t.track_name ilike :search_word_sql")
+    cursor = conn.execute(query, search_word_sql=search_word_sql)
+    result_songs = list(cursor.fetchall())
+    return render_template('search_result.html', search_word=search_word, \
+        url=request.host_url+'songpage/', result_songs=result_songs)
+
 
 @app.route('/playlists/<int:playlist_id>', methods=['GET','POST'])
 def playlists(playlist_id):
