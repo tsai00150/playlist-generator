@@ -67,7 +67,16 @@ def search_result(search_word):
     result_songs = list(cursor.fetchall())
     return render_template('search_result.html', search_word=search_word, \
         url=request.host_url+'songpage/', result_songs=result_songs)
-
+    
+@app.route('/songpage/<int:track_id>', methods=['GET','POST'])
+def songpage(track_id):
+    query = text('''SELECT Track.track_name,Album.album_name,Artist.artist_name,Track.track_pop,Track.duration,
+    Track.vocal_rate,Track.danceable_rate,Track.tempo,Track.key FROM Track,Album,Track_in_album,Artist,Create_track 
+    WHERE Track.track_id = :id and Track.track_id =Track_in_album.track_id and Track_in_album.album_id = Album.album_id and
+    Track.track_id = Create_track.track_id and Artist.artist_id = Create_track.artist_id''')
+    cursor = conn.execute(query,id = track_id)
+    sum = list(cursor.fetchall())
+    return render_template('songpage.html', songname = sum)
 
 @app.route('/playlists/<int:playlist_id>', methods=['GET','POST'])
 def playlists(playlist_id):
