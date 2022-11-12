@@ -93,13 +93,13 @@ def songpage(track_id):
 def playlists(playlist_id):
     if not session.get('logged_in'):
         return render_template('login.html')
-
-    query = text('''SELECT Track.track_name FROM TRACK WHERE Track.track_id in 
+    if 'back_button' in request.form:
+        return redirect(url_for('homepage'))
+    query = text('''SELECT Track.track_id, Track.track_name FROM TRACK WHERE Track.track_id in 
 (SELECT Track_has_playlist.track_id FROM Track_has_playlist WHERE Track_has_playlist.playlist_id = :id)''')
     cursor = conn.execute(query,id = playlist_id)
-    sum = list(cursor.fetchall())
-    
-    return render_template('playlists.html', song = sum)
+    songs = list(cursor.fetchall())
+    return render_template('playlists.html', songs = songs, url=request.host_url+'songpage/')
 
 
 if __name__ == "__main__":
