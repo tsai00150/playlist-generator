@@ -72,6 +72,15 @@ def search_result(search_word):
 def songpage(track_id):
     if not session.get('logged_in'):
         return render_template('login.html')
+    if request.method =='POST':
+        print("11111")
+        if request.form.get('comment_content') == 'Comment':
+            comment_text = request.form['comment_text']
+            print(comment_text)
+
+        if request.form.get('back_home_page') == 'Back':
+            return redirect(url_for('homepage'))
+
     query = text('''SELECT Track.track_name,Album.album_name,Artist.artist_name,Track.track_pop,Track.duration,
     Track.vocal_rate,Track.danceable_rate,Track.tempo,Track.key FROM Track,Album,Track_in_album,Artist,Create_track 
     WHERE Track.track_id = :id and Track.track_id =Track_in_album.track_id and Track_in_album.album_id = Album.album_id and
