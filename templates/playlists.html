@@ -4,11 +4,16 @@
         <title>Playlists</title>
     </head>
     <body>
-        <div>Your playlist song list below</div>
-        {{song}}
-        <br/>
+        <div>Your playlist song list: </div>
+        <br>
+        {% for item in songs %}
+            <a href="{{ url }}{{ item[0] }}"+>{{ item[1] }}</a>
+            <br>
+        {% endfor%}
         <br/>
         <div>click here back to the home page</div>
-        <input type="button" value="back">
+        <form method="post">
+            <input type="submit" name="back_button" value="back">
+        </form>
     </body>
 </html>
