@@ -34,6 +34,7 @@ def do_admin_login():
         session['logged_in'] = True
         session['email'] = account_info[0]
         session['password'] = account_info[1]
+        session['filter_list'] = []
         return redirect(url_for('homepage'))
     
     return render_template('login.html', message="")
@@ -49,13 +50,35 @@ def homepage():
             return redirect(url_for('search_result', search_word=search_word))
 
         if request.form.get('filter_search_submit') == 'Create Playlist':
-            print(request.form)#TODO
+            filter_list = []
+            for key in ['artist_name', 'album_name']:
+                filter_list.append(request.form[key])
+            for key in ['track_pop_lowerbound', 'track_pop_upperbound', \
+                'duration_lowerbound', 'duration_upperbound', \
+                'vocal_rate_lowerbound', 'vocal_rate_upperbound',\
+                'danceable_rate_lowerbound', 'danceable_rate_upperbound',\
+                'tempo', 'key']:
+                if isfloat(request.form[key]) != 'error':
+                    filter_list.append(isfloat(request.form[key]))
+                else:
+                    return redirect(url_for('homepage'))
+            
+            session['filter_list'] = filter_list
+            return redirect(url_for('create_playlist'))
     
     query = text("select p.playlist_id, p.name from Playlist_Produce as p where p.email = :email")
     cursor = conn.execute(query, email=session['email'])
     playlist = list(cursor.fetchall())
     return render_template('homepage.html', \
         url=request.host_url+'playlists/', playlist=playlist)
+
+def isfloat(e):
+    if not e:
+        return e
+    try:
+        return float(e)
+    except ValueError:
+        return 'error'
 
 @app.route('/search_result/<search_word>', methods=['GET','POST'])
 def search_result(search_word):
@@ -100,6 +123,36 @@ def playlists(playlist_id):
     cursor = conn.execute(query,id = playlist_id)
     songs = list(cursor.fetchall())
     return render_template('playlists.html', songs = songs, url=request.host_url+'songpage/')
+
+@app.route('/create_playlist', methods=['GET','POST'])
+def create_playlist():
+    if not session.get('logged_in'):
+        return render_template('login.html')
+    filter_list = session['filter_list']
+    restrictions = []
+    if filter_list[0] != '': #track_name
+        restrictions.append('t.track_name ilike :artist_name')
+    if filter_list[1] != '':#album_name
+        restrictions.append('t.track_id=talb.track_id and talb.album_id=alb.album_id and alb.album_name ilike :album_name')
+    if filter_list[2] != '':#track_pop_lowerbound = filter_list[2]
+        restrictions.append('')
+    track_pop_upperbound = filter_list[3]
+    duration_lowerbound = filter_list[4]
+    duration_upperbound = filter_list[5]
+    vocal_rate_lowerbound = filter_list[6]
+    vocal_rate_upperbound = filter_list[7]
+    danceable_rate_lowerbound = filter_list[8]
+    danceable_rate_upperbound = filter_list[9]
+    tempo = filter_list[10]
+    key = filter_list[11]
+    sqlll = '''SELECT * FROM Track as t, Create_track as tart, Track_in_album as talb, Album as alb, Artist as art
+    WHERE '''
+    
+    query = text(sqlll)
+    cursor = conn.execute(query)
+    songs = list(cursor.fetchall())
+    return render_template('create_playlist.html')
+
 
 
 if __name__ == "__main__":

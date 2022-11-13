@@ -1,0 +1,14 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Create Playlist</title>
+    </head>
+    <body>
+        Playlist
+        <br>
+        {% for item in result_songs %}
+            <a href="{{ url }}{{ item[0] }}"+>{{ item[1] }}</a>
+            <br>
+        {% endfor%}
+    </body>
+</html>
