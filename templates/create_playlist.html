@@ -4,11 +4,20 @@
         <title>Create Playlist</title>
     </head>
     <body>
-        Playlist
+        <div> Your playlist that want to create</div>
         <br>
         {% for item in result_songs %}
             <a href="{{ url }}{{ item[0] }}"+>{{ item[1] }}</a>
             <br>
         {% endfor%}
+        <div>click here to save playlist</div>
+        <form method="post">
+            <input type="submit" name="save_button" value="save">
+        </form>
+        <br/>
+        <div>click here back to the home page</div>
+        <form method="post">
+            <input type="submit" name="back_button" value="back">
+        </form>
     </body>
 </html>
