@@ -218,7 +218,6 @@ def create_playlist():
     sqltext = '''SELECT distinct t.track_id FROM Track as t, Create_track as tart, Track_in_album as talb, Album as alb, Artist as art'''
     if restrictions:
         postfix = ' and '.join(restrictions)
-        
         sqltext = sqltext + " WHERE " + postfix
     query = text(sqltext)
     print(query)
@@ -229,7 +228,7 @@ def create_playlist():
         danceable_rate_lowerbound=danceable_rate_lowerbound, danceable_rate_upperbound=danceable_rate_upperbound, \
         tempo_lowerbound=tempo_lowerbound, tempo_upperbound=tempo_upperbound, key=key)
     songs = list(cursor.fetchall())
-    print(songs)
+    session['create_playlist'] = songs
     return render_template('create_playlist.html')
 
 
