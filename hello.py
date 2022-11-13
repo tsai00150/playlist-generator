@@ -96,11 +96,24 @@ def songpage(track_id):
     if not session.get('logged_in'):
         return render_template('login.html')
     if request.method =='POST':
-        print("11111")
         if request.form.get('comment_content') == 'Comment':
             comment_text = request.form['comment_text']
-            print(comment_text)
-
+            query3 = text('''SELECT Count(*) FROM Comment''')
+            cursor3 = conn.execute(query3)
+            commen_id = cursor3.fetchall()
+            comment_id =5030 + commen_id[0][0]
+            query = text('''INSERT INTO Comment VALUES (:comment_id, :track_id, :email, :content)''')
+            cursor =conn.execute(query,comment_id = comment_id,track_id = track_id,email =session['email'],content = comment_text)
+            query = text('''SELECT Track.track_name,Album.album_name,Artist.artist_name,Track.track_pop,Track.duration,
+    Track.vocal_rate,Track.danceable_rate,Track.tempo,Track.key FROM Track,Album,Track_in_album,Artist,Create_track 
+    WHERE Track.track_id = :id and Track.track_id =Track_in_album.track_id and Track_in_album.album_id = Album.album_id and
+    Track.track_id = Create_track.track_id and Artist.artist_id = Create_track.artist_id''')
+            query2 = text('''SELECT Comment.content,Comment.email FROM Comment WHERE Comment.track_id = :track_id ''')
+            cursor2 = conn.execute(query2,track_id =track_id)
+            cursor = conn.execute(query,id = track_id)
+            comment = list(cursor2.fetchall())
+            sum = list(cursor.fetchall())
+            return render_template('songpage.html', songname = sum, comment = comment)
         if request.form.get('back_home_page') == 'Back':
             return redirect(url_for('homepage'))
 
@@ -110,7 +123,10 @@ def songpage(track_id):
     Track.track_id = Create_track.track_id and Artist.artist_id = Create_track.artist_id''')
     cursor = conn.execute(query,id = track_id)
     sum = list(cursor.fetchall())
-    return render_template('songpage.html', songname = sum)
+    query2 = text('''SELECT Comment.content,Comment.email FROM Comment WHERE Comment.track_id = :track_id ''')
+    cursor2 = conn.execute(query2,track_id =track_id)
+    comment = list(cursor2.fetchall())
+    return render_template('songpage.html', songname = sum,comment = comment)
 
 @app.route('/playlists/<int:playlist_id>', methods=['GET','POST'])
 def playlists(playlist_id):

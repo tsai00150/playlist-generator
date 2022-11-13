@@ -32,6 +32,13 @@
         <br/>
         key is: {{songname[0][8]}}
         <br/>
+        <br/>
+        comment is: 
+        {% for item in comment %}
+            {{item[0]}} comment by {{item[1]}}
+            <br>
+        {% endfor%}
+        <br/>
         <form method="POST">
         <div>please enter a word or sentence that you want to comment</div>
         <input type="text" name="comment_text">
