@@ -145,91 +145,98 @@ def create_playlist():
     if not session.get('logged_in'):
         return render_template('login.html')
     if request.method =='POST':
-        if request.form.get('back_button') == 'back':
+        if 'back_button' in request.form:
             session['create_playlist'] = None
             return redirect(url_for('homepage'))
-        if request.form.get('save_button') == 'save':
-            #insert Track_has_playlist
-            query = text('''SELECT Count(*) FROM Track_has_playlist''')
-            cursor = conn.execute(query)
-            new_playlist_id = cursor.fetchall()
-            new_playlist_id =4001 + new_playlist_id[0][0]
-            for track_id in session['create_playlist']:
-                query1 = text('''INSERT INTO Track_has_playlist VALUES (:track_id, :playlist_id)''')
-                cursor1 =conn.execute(query1,track_id = track_id,playlist_id = new_playlist_id)
-
+        if 'save_button' in request.form:
             #insert plsylist_Produce
             query2 = text('''SELECT Count(*) FROM Track_has_playlist''')
             cursor2 = conn.execute(query2)
             new_name_id = cursor2.fetchall()
-            new_name_id =1 + new_playlist_id[0][0]
+            new_name_id =1 + new_name_id[0][0]
             name = 'mylove' + str(new_name_id)
+
+            query = text('''SELECT Count(*) FROM Track_has_playlist''')
+            cursor = conn.execute(query)
+            new_playlist_id = cursor.fetchall()
+            new_playlist_id =4001 + new_playlist_id[0][0]
+            track_id = session['create_playlist'][0]
+
             query3 = text('''INSERT INTO Playlist_Produce VALUES (:playlist_id, :email, :name)''')
             cursor3 =conn.execute(query3,playlist_id = new_playlist_id,email = session['email'], name = name)
-            
+
+
+            for track_id in session['create_playlist']:
+                query1 = text('''INSERT INTO Track_has_playlist VALUES (:track_id, :playlist_id)''')
+                cursor1 =conn.execute(query1,track_id = track_id,playlist_id = new_playlist_id)
+
             #back homepage
             return redirect(url_for('homepage'))
 
 
-
-    filter_list = session['filter_list']
-    restrictions = []
-    artist_name = filter_list[0]
-    if artist_name != '':
-        artist_name = '%' + artist_name + '%'
-        restrictions.append('t.track_id=tart.track_id and tart.artist_id=art.artist_id and art.artist_name ilike :artist_name')
-    album_name = filter_list[1]
-    if album_name != '':
-        album_name = '%' + album_name + '%'
-        restrictions.append('t.track_id=talb.track_id and talb.album_id=alb.album_id and alb.album_name ilike :album_name')
-    track_pop_lowerbound = filter_list[2]
-    if track_pop_lowerbound != '':
-        restrictions.append('t.track_pop >= :track_pop_lowerbound')
-    track_pop_upperbound = filter_list[3]
-    if track_pop_upperbound != '':
-        restrictions.append('t.track_pop <= :track_pop_upperbound')
-    duration_lowerbound = filter_list[4]
-    if duration_lowerbound != '':
-        restrictions.append('t.duration >= :duration_lowerbound')
-    duration_upperbound = filter_list[5]
-    if duration_upperbound != '':
-        restrictions.append('t.duration <= :duration_upperbound')
-    vocal_rate_lowerbound = filter_list[6]
-    if vocal_rate_lowerbound != '':
-        restrictions.append('t.vocal_rate >= :vocal_rate_lowerbound')
-    vocal_rate_upperbound = filter_list[7]
-    if vocal_rate_upperbound != '':
-        restrictions.append('t.vocal_rate <= :vocal_rate_upperbound')
-    danceable_rate_lowerbound = filter_list[8]
-    if danceable_rate_lowerbound != '':
-        restrictions.append('t.danceable_rate >= :danceable_rate_lowerbound')
-    danceable_rate_upperbound = filter_list[9]
-    if danceable_rate_upperbound != '':
-        restrictions.append('t.danceable_rate <= :danceable_rate_upperbound')
-    tempo_lowerbound = filter_list[10]
-    if tempo_lowerbound != '':
-        restrictions.append('t.tempo >= :tempo_lowerbound' ) 
-    tempo_upperbound = filter_list[11]
-    if tempo_upperbound != '':
-        restrictions.append('t.tempo <= :tempo_upperbound' ) 
-    key = filter_list[12]
-    if key != '':
-        restrictions.append('t.key = :key')
-    sqltext = '''SELECT distinct t.track_id FROM Track as t, Create_track as tart, Track_in_album as talb, Album as alb, Artist as art'''
-    if restrictions:
-        postfix = ' and '.join(restrictions)
-        sqltext = sqltext + " WHERE " + postfix
-    query = text(sqltext)
-    print(query)
-    cursor = conn.execute(query, artist_name=artist_name, album_name=album_name, \
-        track_pop_lowerbound=track_pop_lowerbound, track_pop_upperbound=track_pop_upperbound, \
-        duration_lowerbound=duration_lowerbound, duration_upperbound=duration_upperbound, \
-        vocal_rate_lowerbound=vocal_rate_lowerbound, vocal_rate_upperbound=vocal_rate_upperbound, \
-        danceable_rate_lowerbound=danceable_rate_lowerbound, danceable_rate_upperbound=danceable_rate_upperbound, \
-        tempo_lowerbound=tempo_lowerbound, tempo_upperbound=tempo_upperbound, key=key)
-    songs = list(cursor.fetchall())
-    session['create_playlist'] = songs
-    return render_template('create_playlist.html')
+    if request.method =='GET':
+        print("--------------------------")
+        filter_list = session['filter_list']
+        restrictions = []
+        artist_name = filter_list[0]
+        if artist_name != '':
+            artist_name = '%' + artist_name + '%'
+            restrictions.append('t.track_id=tart.track_id and tart.artist_id=art.artist_id and art.artist_name ilike :artist_name')
+        album_name = filter_list[1]
+        if album_name != '':
+            album_name = '%' + album_name + '%'
+            restrictions.append('t.track_id=talb.track_id and talb.album_id=alb.album_id and alb.album_name ilike :album_name')
+        track_pop_lowerbound = filter_list[2]
+        if track_pop_lowerbound != '':
+            restrictions.append('t.track_pop >= :track_pop_lowerbound')
+        track_pop_upperbound = filter_list[3]
+        if track_pop_upperbound != '':
+            restrictions.append('t.track_pop <= :track_pop_upperbound')
+        duration_lowerbound = filter_list[4]
+        if duration_lowerbound != '':
+            restrictions.append('t.duration >= :duration_lowerbound')
+        duration_upperbound = filter_list[5]
+        if duration_upperbound != '':
+            restrictions.append('t.duration <= :duration_upperbound')
+        vocal_rate_lowerbound = filter_list[6]
+        if vocal_rate_lowerbound != '':
+            restrictions.append('t.vocal_rate >= :vocal_rate_lowerbound')
+        vocal_rate_upperbound = filter_list[7]
+        if vocal_rate_upperbound != '':
+            restrictions.append('t.vocal_rate <= :vocal_rate_upperbound')
+        danceable_rate_lowerbound = filter_list[8]
+        if danceable_rate_lowerbound != '':
+            restrictions.append('t.danceable_rate >= :danceable_rate_lowerbound')
+        danceable_rate_upperbound = filter_list[9]
+        if danceable_rate_upperbound != '':
+            restrictions.append('t.danceable_rate <= :danceable_rate_upperbound')
+        tempo_lowerbound = filter_list[10]
+        if tempo_lowerbound != '':
+            restrictions.append('t.tempo >= :tempo_lowerbound' ) 
+        tempo_upperbound = filter_list[11]
+        if tempo_upperbound != '':
+            restrictions.append('t.tempo <= :tempo_upperbound' ) 
+        key = filter_list[12]
+        if key != '':
+            restrictions.append('t.key = :key')
+        sqltext = '''SELECT distinct t.track_id FROM Track as t, Create_track as tart, Track_in_album as talb, Album as alb, Artist as art'''
+        if restrictions:
+            postfix = ' and '.join(restrictions)
+            sqltext = sqltext + " WHERE " + postfix
+        query = text(sqltext)
+        print(query)
+        cursor = conn.execute(query, artist_name=artist_name, album_name=album_name, \
+            track_pop_lowerbound=track_pop_lowerbound, track_pop_upperbound=track_pop_upperbound, \
+            duration_lowerbound=duration_lowerbound, duration_upperbound=duration_upperbound, \
+            vocal_rate_lowerbound=vocal_rate_lowerbound, vocal_rate_upperbound=vocal_rate_upperbound, \
+            danceable_rate_lowerbound=danceable_rate_lowerbound, danceable_rate_upperbound=danceable_rate_upperbound, \
+            tempo_lowerbound=tempo_lowerbound, tempo_upperbound=tempo_upperbound, key=key)
+        songs = list(cursor.fetchall())
+        for i in range(len(songs)):
+            songs[i] = songs[i][0]
+        session['create_playlist'] = songs
+        print(session['create_playlist'])
+        return render_template('create_playlist.html')
 
 
 
