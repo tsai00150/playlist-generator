@@ -155,6 +155,8 @@ def create_playlist():
             return redirect(url_for('homepage'))
         if 'save_button' in request.form:
             #insert plsylist_Produce
+            if len(session['create_playlist'])<1:
+                return redirect(url_for('homepage'))
             query2 = text('''SELECT Count(*) FROM Track_has_playlist''')
             cursor2 = conn.execute(query2)
             new_name_id = cursor2.fetchall()
