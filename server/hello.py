@@ -61,7 +61,12 @@ def homepage():
                 if isfloat(request.form[key]) != 'error':
                     filter_list.append(isfloat(request.form[key]))
                 else:
-                    return redirect(url_for('homepage'))
+                    query = text("select p.playlist_id, p.name from Playlist_Produce as p where p.email = :email")
+                    cursor = conn.execute(query, email=session['email'])
+                    playlist = list(cursor.fetchall())
+                    return render_template('homepage.html', \
+                        url=request.host_url+'playlists/', playlist=playlist, \
+                        message="Value error, please try again. ")
             
             session['filter_list'] = filter_list
             return redirect(url_for('create_playlist'))
@@ -70,7 +75,7 @@ def homepage():
     cursor = conn.execute(query, email=session['email'])
     playlist = list(cursor.fetchall())
     return render_template('homepage.html', \
-        url=request.host_url+'playlists/', playlist=playlist)
+        url=request.host_url+'playlists/', playlist=playlist, message="")
 
 def isfloat(e):
     if not e:
