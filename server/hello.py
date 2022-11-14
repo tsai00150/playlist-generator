@@ -234,7 +234,6 @@ def create_playlist():
         for i in range(len(songs)):
             session['create_playlist'].append(songs[i][0])
 
-        print(songs)
         return render_template('create_playlist.html', url=request.host_url+'songpage/', \
             result_songs=songs)
 
