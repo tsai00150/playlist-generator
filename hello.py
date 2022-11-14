@@ -175,7 +175,6 @@ def create_playlist():
 
 
     if request.method =='GET':
-        print("--------------------------")
         filter_list = session['filter_list']
         restrictions = []
         artist_name = filter_list[0]
@@ -219,12 +218,11 @@ def create_playlist():
         key = filter_list[12]
         if key != '':
             restrictions.append('t.key = :key')
-        sqltext = '''SELECT distinct t.track_id FROM Track as t, Create_track as tart, Track_in_album as talb, Album as alb, Artist as art'''
+        sqltext = '''SELECT distinct t.track_id, t.track_name FROM Track as t, Create_track as tart, Track_in_album as talb, Album as alb, Artist as art'''
         if restrictions:
             postfix = ' and '.join(restrictions)
             sqltext = sqltext + " WHERE " + postfix
         query = text(sqltext)
-        print(query)
         cursor = conn.execute(query, artist_name=artist_name, album_name=album_name, \
             track_pop_lowerbound=track_pop_lowerbound, track_pop_upperbound=track_pop_upperbound, \
             duration_lowerbound=duration_lowerbound, duration_upperbound=duration_upperbound, \
@@ -232,11 +230,13 @@ def create_playlist():
             danceable_rate_lowerbound=danceable_rate_lowerbound, danceable_rate_upperbound=danceable_rate_upperbound, \
             tempo_lowerbound=tempo_lowerbound, tempo_upperbound=tempo_upperbound, key=key)
         songs = list(cursor.fetchall())
+        session['create_playlist'] = []
         for i in range(len(songs)):
-            songs[i] = songs[i][0]
-        session['create_playlist'] = songs
-        print(session['create_playlist'])
-        return render_template('create_playlist.html')
+            session['create_playlist'].append(songs[i][0])
+
+        print(songs)
+        return render_template('create_playlist.html', url=request.host_url+'songpage/', \
+            result_songs=songs)
 
 
 
